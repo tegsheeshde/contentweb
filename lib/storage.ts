@@ -39,6 +39,7 @@ export async function getUploadSignedUrl(
   });
   return getSignedUrl(r2, command, {
     expiresIn: 3600,
+    signableHeaders: new Set(["content-type"]),
     unhoistableHeaders: new Set([
       "x-amz-checksum-crc32",
       "x-amz-sdk-checksum-algorithm",
