@@ -8,25 +8,29 @@ export async function GET() {
   const isAdmin = (session?.user as { isAdmin?: boolean })?.isAdmin ?? false;
   if (!isAdmin) return Response.json({ error: "Forbidden" }, { status: 403 });
 
-  await r2.send(
-    new PutBucketCorsCommand({
-      Bucket: process.env.R2_BUCKET_NAME!,
-      CORSConfiguration: {
-        CORSRules: [
-          {
-            AllowedOrigins: [
-              "http://localhost:3000",
-              "https://contentweb-iota.vercel.app",
-            ],
-            AllowedMethods: ["GET", "PUT", "HEAD"],
-            AllowedHeaders: ["*"],
-            ExposeHeaders: ["ETag", "Content-Length", "Content-Type"],
-            MaxAgeSeconds: 3600,
-          },
-        ],
-      },
-    })
-  );
-
-  return Response.json({ ok: true, message: "CORS policy set via S3 API" });
+  try {
+    await r2.send(
+      new PutBucketCorsCommand({
+        Bucket: process.env.R2_BUCKET_NAME!,
+        CORSConfiguration: {
+          CORSRules: [
+            {
+              AllowedOrigins: [
+                "http://localhost:3000",
+                "https://contentweb-iota.vercel.app",
+              ],
+              AllowedMethods: ["GET", "PUT", "HEAD"],
+              AllowedHeaders: ["*"],
+              ExposeHeaders: ["ETag", "Content-Length", "Content-Type"],
+              MaxAgeSeconds: 3600,
+            },
+          ],
+        },
+      })
+    );
+    return Response.json({ ok: true });
+  } catch (e) {
+    console.error("[setup/cors]", e);
+    return Response.json({ error: String(e) }, { status: 500 });
+  }
 }
