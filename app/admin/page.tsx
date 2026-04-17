@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import AdminUploadForm from "@/components/AdminUploadForm";
+import DeleteVideoButton from "@/components/DeleteVideoButton";
 
 export const metadata = { title: "Admin — ContentWeb" };
 
@@ -39,15 +40,18 @@ export default async function AdminPage() {
               <ul className="space-y-3">
                 {videos.map((v) => (
                   <li key={v.id} className="flex items-center justify-between gap-2 text-sm">
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-white font-medium line-clamp-1">{v.title}</p>
                       <p className="text-zinc-500 text-xs">{v.duration}</p>
                     </div>
-                    {v.isPremium && (
-                      <span className="shrink-0 bg-yellow-500 text-black text-xs font-bold px-2 py-0.5 rounded">
-                        PREMIUM
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2 shrink-0">
+                      {v.isPremium && (
+                        <span className="bg-yellow-500 text-black text-xs font-bold px-2 py-0.5 rounded">
+                          PREMIUM
+                        </span>
+                      )}
+                      <DeleteVideoButton id={v.id} />
+                    </div>
                   </li>
                 ))}
               </ul>
