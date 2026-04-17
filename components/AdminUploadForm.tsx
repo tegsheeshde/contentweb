@@ -12,11 +12,11 @@ export default function AdminUploadForm() {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  async function uploadToR2(url: string, file: File, onProgress?: (pct: number) => void) {
+  async function uploadToR2(url: string, file: File, contentType: string, onProgress?: (pct: number) => void) {
     return new Promise<void>((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open("PUT", url);
-      xhr.setRequestHeader("Content-Type", file.type);
+      xhr.setRequestHeader("Content-Type", contentType);
       if (onProgress) {
         xhr.upload.onprogress = (e) => {
           if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
@@ -61,14 +61,14 @@ export default function AdminUploadForm() {
       setProgress(10);
 
       // 2. Видео R2-д шууд upload (XHR — progress харуулна)
-      await uploadToR2(data.uploadUrl, videoFile, (pct) =>
+      await uploadToR2(data.uploadUrl, videoFile, data.videoContentType, (pct) =>
         setProgress(10 + Math.round(pct * 0.85))
       );
       setProgress(95);
 
       // 3. Thumbnail upload
       if (thumbFile) {
-        await uploadToR2(data.thumbnailUploadUrl, thumbFile);
+        await uploadToR2(data.thumbnailUploadUrl, thumbFile, data.thumbContentType);
       }
 
       setProgress(100);

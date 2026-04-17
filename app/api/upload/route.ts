@@ -35,10 +35,19 @@ export async function POST(request: NextRequest) {
     data: { r2Key: vKey, thumbnailKey: tKey },
   });
 
+  const videoContentType = body.contentType || "video/mp4";
+  const thumbContentType = body.thumbnailContentType || "image/jpeg";
+
   const [uploadUrl, thumbnailUploadUrl] = await Promise.all([
-    getUploadSignedUrl(vKey, body.contentType),
-    getUploadSignedUrl(tKey, body.thumbnailContentType ?? "image/jpeg"),
+    getUploadSignedUrl(vKey, videoContentType),
+    getUploadSignedUrl(tKey, thumbContentType),
   ]);
 
-  return Response.json({ videoId: video.id, uploadUrl, thumbnailUploadUrl }, { status: 201 });
+  return Response.json({
+    videoId: video.id,
+    uploadUrl,
+    thumbnailUploadUrl,
+    videoContentType,
+    thumbContentType,
+  }, { status: 201 });
 }
