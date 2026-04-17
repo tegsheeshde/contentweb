@@ -9,65 +9,35 @@ export default function AdminUploadForm() {
   const thumbRef = useRef<HTMLInputElement>(null);
 
   const [step, setStep] = useState<"form" | "uploading" | "done">("form");
-  const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
 
-    const form = new FormData(e.currentTarget);
     const videoFile = videoRef.current?.files?.[0];
-    const thumbFile = thumbRef.current?.files?.[0];
-
     if (!videoFile) {
       setError("Видео файл сонгоно уу");
       return;
     }
 
+    const form = new FormData(e.currentTarget);
+    form.set("video", videoFile);
+    if (thumbRef.current?.files?.[0]) {
+      form.set("thumbnail", thumbRef.current.files[0]);
+    }
+
     setStep("uploading");
-    setProgress(10);
 
     try {
-      // 1. DB-д бүртгэж presigned URL авах
       const res = await fetch("/api/upload", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: form.get("title"),
-          description: form.get("description") || null,
-          duration: form.get("duration"),
-          isPremium: form.get("isPremium") === "true",
-          contentType: videoFile.type || "video/mp4",
-        }),
+        body: form,
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Алдаа гарлаа");
 
-      setProgress(30);
-
-      // 2. Видео R2-д upload
-      const uploadRes = await fetch(data.uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": videoFile.type || "video/mp4" },
-        body: videoFile,
-      });
-      if (!uploadRes.ok) throw new Error(`R2 upload failed: ${uploadRes.status}`);
-
-      setProgress(80);
-
-      // 3. Thumbnail upload (хэрэв байвал)
-      if (thumbFile && data.thumbnailUploadUrl) {
-        const thumbRes = await fetch(data.thumbnailUploadUrl, {
-          method: "PUT",
-          headers: { "Content-Type": thumbFile.type || "image/jpeg" },
-          body: thumbFile,
-        });
-        if (!thumbRes.ok) throw new Error(`Thumbnail upload failed: ${thumbRes.status}`);
-      }
-
-      setProgress(100);
       setStep("done");
       router.refresh();
     } catch (e) {
@@ -82,7 +52,7 @@ export default function AdminUploadForm() {
         <div className="text-4xl mb-3">✓</div>
         <p className="text-white font-medium mb-1">Амжилттай нэмэгдлээ!</p>
         <button
-          onClick={() => { setStep("form"); setProgress(0); }}
+          onClick={() => setStep("form")}
           className="mt-4 text-yellow-400 text-sm hover:underline"
         >
           Дахин нэмэх
@@ -93,15 +63,9 @@ export default function AdminUploadForm() {
 
   if (step === "uploading") {
     return (
-      <div className="py-8">
-        <p className="text-zinc-300 text-sm mb-3 text-center">Upload хийж байна...</p>
-        <div className="w-full bg-zinc-700 rounded-full h-2">
-          <div
-            className="bg-yellow-500 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <p className="text-zinc-500 text-xs mt-2 text-center">{progress}%</p>
+      <div className="py-8 text-center">
+        <div className="w-8 h-8 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <p className="text-zinc-300 text-sm">Upload хийж байна... түр хүлээнэ үү</p>
       </div>
     );
   }
