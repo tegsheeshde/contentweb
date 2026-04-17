@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-const CHUNK_SIZE = 100 * 1024 * 1024; // 100MB
+const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB
 
 export default function AdminUploadForm() {
   const router = useRouter();
@@ -23,7 +23,8 @@ export default function AdminUploadForm() {
           const etag = xhr.getResponseHeader("ETag") ?? xhr.getResponseHeader("etag") ?? `"part${partNumber}"`;
           resolve(etag);
         } else {
-          reject(new Error(`Part ${partNumber} failed: ${xhr.status} ${xhr.responseText}`));
+          console.error(`Part ${partNumber} error:`, xhr.status, xhr.responseText);
+          reject(new Error(`Part ${partNumber}/${total} failed: ${xhr.status} ${xhr.responseText}`));
         }
       };
       xhr.onerror = () => reject(new Error(`Part ${partNumber} network error`));

@@ -11,7 +11,7 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const BUCKET = process.env.R2_BUCKET_NAME!;
-const CHUNK_SIZE = 100 * 1024 * 1024; // 100MB per part
+const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB per part
 
 // POST /api/upload/multipart
 // action=start   → multipart upload эхлэх, part presigned URLs буцаана
