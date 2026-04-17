@@ -27,6 +27,8 @@ async function getMovies(): Promise<Movie[]> {
   );
 }
 
+export const revalidate = 0;
+
 export default async function HomePage() {
   const movies = await getMovies();
 

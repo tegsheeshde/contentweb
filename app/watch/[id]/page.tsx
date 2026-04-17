@@ -12,6 +12,7 @@ export default async function WatchPage({ params }: PageProps) {
   const { id } = await params;
   const session = await auth();
   const isSubscribed = (session?.user as { subscribed?: boolean })?.subscribed ?? false;
+  const isAdmin = (session?.user as { isAdmin?: boolean })?.isAdmin ?? false;
 
   const video = await db.video.findUnique({ where: { id } });
 
@@ -23,7 +24,7 @@ export default async function WatchPage({ params }: PageProps) {
     );
   }
 
-  const canWatch = !video.isPremium || isSubscribed;
+  const canWatch = !video.isPremium || isSubscribed || isAdmin;
 
   const signedUrl = canWatch ? await getVideoSignedUrl(video.r2Key) : null;
   const thumbnailUrl = video.thumbnailKey
