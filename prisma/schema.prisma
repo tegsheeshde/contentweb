@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String
+  subscribed     Boolean        @default(false)
+  isAdmin        Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  subscriptions  Subscription[]
+}
+
+model Subscription {
+  id        String    @id @default(cuid())
+  userId    String
+  invoiceId String    @unique
+  status    String    @default("PENDING")
+  amount    Int
+  createdAt DateTime  @default(now())
+  paidAt    DateTime?
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+model Video {
+  id           String   @id @default(cuid())
+  title        String
+  description  String?
+  duration     String
+  isPremium    Boolean  @default(true)
+  r2Key        String   @unique  // e.g. videos/abc123.mp4
+  thumbnailKey String?           // e.g. thumbnails/abc123.jpg
+  publishedAt  DateTime @default(now())
+  createdAt    DateTime @default(now())
+}
