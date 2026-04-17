@@ -15,7 +15,7 @@ async function getMovies(): Promise<Movie[]> {
       duration: true,
       isPremium: true,
       thumbnailKey: true,
-      publishedAt: true as true,
+      publishedAt: true,
     },
   });
 
