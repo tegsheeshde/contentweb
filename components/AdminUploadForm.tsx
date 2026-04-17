@@ -22,7 +22,14 @@ export default function AdminUploadForm() {
           if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
         };
       }
-      xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`R2 upload failed: ${xhr.status}`)));
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve();
+        } else {
+          console.error("R2 error body:", xhr.responseText);
+          reject(new Error(`R2 upload failed: ${xhr.status} — ${xhr.responseText}`));
+        }
+      };
       xhr.onerror = () => reject(new Error("Network error"));
       xhr.send(file);
     });
