@@ -27,7 +27,7 @@ export async function getVideoSignedUrl(key: string): Promise<string> {
   return getSignedUrl(r2, command, { expiresIn: 3600 });
 }
 
-// Upload presigned URL — admin видео upload хийх (10 минут хүчинтэй)
+// Upload presigned URL — browser шууд R2-д upload хийх (1 цаг хүчинтэй)
 export async function getUploadSignedUrl(
   key: string,
   contentType: string
@@ -37,7 +37,13 @@ export async function getUploadSignedUrl(
     Key: key,
     ContentType: contentType,
   });
-  return getSignedUrl(r2, command, { expiresIn: 600 });
+  return getSignedUrl(r2, command, {
+    expiresIn: 3600,
+    unhoistableHeaders: new Set([
+      "x-amz-checksum-crc32",
+      "x-amz-sdk-checksum-algorithm",
+    ]),
+  });
 }
 
 export async function deleteVideo(key: string): Promise<void> {
