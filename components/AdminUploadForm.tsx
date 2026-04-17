@@ -48,21 +48,23 @@ export default function AdminUploadForm() {
       setProgress(30);
 
       // 2. Видео R2-д upload
-      await fetch(data.uploadUrl, {
+      const uploadRes = await fetch(data.uploadUrl, {
         method: "PUT",
         headers: { "Content-Type": videoFile.type || "video/mp4" },
         body: videoFile,
       });
+      if (!uploadRes.ok) throw new Error(`R2 upload failed: ${uploadRes.status}`);
 
       setProgress(80);
 
       // 3. Thumbnail upload (хэрэв байвал)
       if (thumbFile && data.thumbnailUploadUrl) {
-        await fetch(data.thumbnailUploadUrl, {
+        const thumbRes = await fetch(data.thumbnailUploadUrl, {
           method: "PUT",
           headers: { "Content-Type": thumbFile.type || "image/jpeg" },
           body: thumbFile,
         });
+        if (!thumbRes.ok) throw new Error(`Thumbnail upload failed: ${thumbRes.status}`);
       }
 
       setProgress(100);
