@@ -24,7 +24,7 @@ export async function getVideoSignedUrl(key: string): Promise<string> {
   }
   const { GetObjectCommand } = await import("@aws-sdk/client-s3");
   const command = new GetObjectCommand({ Bucket: BUCKET, Key: key });
-  return getSignedUrl(r2, command, { expiresIn: 3600 });
+  return getSignedUrl(r2, command, { expiresIn: 21600 }); // 6 hours
 }
 
 // Upload presigned URL — browser шууд R2-д upload хийх (1 цаг хүчинтэй)
