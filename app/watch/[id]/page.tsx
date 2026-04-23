@@ -31,7 +31,7 @@ export default async function WatchPage({ params }: PageProps) {
 
   const canWatch = !video.isPremium || isSubscribed || isAdmin;
 
-  const signedUrl = canWatch ? await getVideoSignedUrl(video.r2Key) : null;
+  const streamUrl = canWatch ? `/api/stream/${video.id}` : null;
   const thumbnailUrl = video.thumbnailKey
     ? await getVideoSignedUrl(video.thumbnailKey)
     : null;
@@ -41,8 +41,8 @@ export default async function WatchPage({ params }: PageProps) {
       {/* Full-width video area */}
       <div className="bg-black">
         <div className="max-w-6xl mx-auto px-4 pt-20 pb-6">
-          {signedUrl ? (
-            <VideoPlayer signedUrl={signedUrl} title={video.title} posterUrl={thumbnailUrl ?? undefined} />
+          {streamUrl ? (
+            <VideoPlayer signedUrl={streamUrl} title={video.title} posterUrl={thumbnailUrl ?? undefined} />
           ) : (
             <div className="aspect-video relative rounded-xl overflow-hidden bg-zinc-950">
               {thumbnailUrl && (

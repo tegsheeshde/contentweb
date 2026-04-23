@@ -16,7 +16,7 @@ export default function VideoPlayer({ signedUrl, title, posterUrl }: VideoPlayer
         playsInline
         preload="metadata"
         aria-label={title}
-        style={{ width: "100%", height: "100%" }}
+        style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "contain" }}
         onError={(e) => {
           const err = e.currentTarget.error;
           console.error("Video error code:", err?.code, "message:", err?.message);
